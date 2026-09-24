@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 
-from application.extensions import db
+from application.extensions import db, limiter, cache
 from application.models import Customer
 from application.blueprints.customer.schemas import (
     customer_schema,
@@ -12,6 +12,8 @@ customer_bp = Blueprint('customer_bp', __name__)
 
 
 @customer_bp.route('/customers', methods=['POST'])
+# Rate limiting prevents excessive customer creation requests.
+@limiter.limit("3 per hour")
 def create_customer():
     data = request.get_json()
 
@@ -28,6 +30,8 @@ def create_customer():
 
 
 @customer_bp.route('/customers', methods=['GET'])
+# Caching reduces repetitive database queries for frequently requested customer data.
+@cache.cached(timeout=60)
 def get_customers():
     customers = db.session.query(Customer).all()
 

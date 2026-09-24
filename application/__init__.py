@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 
-from application.extensions import db, ma
+from application.extensions import db, ma, limiter, cache
 from application.blueprints.customer.routes import customer_bp
 from application.blueprints.mechanic import mechanic_bp
 from application.blueprints.service_ticket import service_ticket_bp
@@ -16,6 +16,8 @@ def create_app():
 
     db.init_app(app)
     ma.init_app(app)
+    limiter.init_app(app)
+    cache.init_app(app)
 
     app.register_blueprint(customer_bp)
     app.register_blueprint(mechanic_bp, url_prefix='/mechanics')
