@@ -7,6 +7,7 @@ from application.blueprints.service_ticket.schemas import (
     service_ticket_schema,
     service_tickets_schema
 )
+from application.utils.util import token_required
 
 
 @service_ticket_bp.route('/', methods=['POST'])
@@ -29,6 +30,16 @@ def create_service_ticket():
 @service_ticket_bp.route('/', methods=['GET'])
 def get_service_tickets():
     service_tickets = db.session.query(ServiceTicket).all()
+
+    return service_tickets_schema.jsonify(service_tickets), 200
+
+
+@service_ticket_bp.route('/my-tickets', methods=['GET'])
+@token_required
+def get_my_tickets(customer_id):
+    service_tickets = db.session.query(ServiceTicket).filter_by(
+        customer_id=int(customer_id)
+    ).all()
 
     return service_tickets_schema.jsonify(service_tickets), 200
 

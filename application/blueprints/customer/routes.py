@@ -4,8 +4,10 @@ from application.extensions import db, limiter, cache
 from application.models import Customer
 from application.blueprints.customer.schemas import (
     customer_schema,
-    customers_schema
+    customers_schema,
+    login_schema,
 )
+from application.utils.util import encode_token
 
 
 customer_bp = Blueprint('customer_bp', __name__)
@@ -20,13 +22,33 @@ def create_customer():
     new_customer = Customer(
         name=data['name'],
         email=data['email'],
-        phone=data['phone']
+        phone=data['phone'],
+        password=data['password']
     )
 
     db.session.add(new_customer)
     db.session.commit()
 
     return customer_schema.jsonify(new_customer), 201
+
+@customer_bp.route('/customers/login', methods=['POST'])
+def login():
+    data = login_schema.load(request.get_json())
+
+    customer = db.session.query(Customer).filter_by(
+        email=data['email']
+    ).first()
+
+    if customer and customer.password == data['password']:
+        auth_token = encode_token(customer.id)
+
+        return jsonify({
+            "status": "success",
+            "message": "Successfully Logged In",
+            "auth_token": auth_token
+        }), 200
+
+    return jsonify({"message": "Invalid email or password"}), 401
 
 
 @customer_bp.route('/customers', methods=['GET'])
