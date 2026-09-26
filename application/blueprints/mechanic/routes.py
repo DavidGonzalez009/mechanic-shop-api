@@ -62,3 +62,14 @@ def delete_mechanic(id):
     db.session.commit()
 
     return jsonify({"message": "Mechanic deleted successfully"}), 200
+
+@mechanic_bp.route('/most-active', methods=['GET'])
+def get_most_active_mechanics():
+    mechanics = db.session.query(Mechanic).all()
+
+    mechanics.sort(
+        key=lambda mechanic: len(mechanic.service_tickets),
+        reverse=True
+    )
+
+    return mechanics_schema.jsonify(mechanics), 200

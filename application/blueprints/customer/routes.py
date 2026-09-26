@@ -53,9 +53,17 @@ def login():
 
 @customer_bp.route('/customers', methods=['GET'])
 # Caching reduces repetitive database queries for frequently requested customer data.
-@cache.cached(timeout=60)
+@cache.cached(timeout=60, query_string=True)
 def get_customers():
-    customers = db.session.query(Customer).all()
+    limit = request.args.get('limit', 10, type=int)
+    offset = request.args.get('offset', 0, type=int)
+
+    customers = (
+        db.session.query(Customer)
+        .limit(limit)
+        .offset(offset)
+        .all()
+    )
 
     return customers_schema.jsonify(customers), 200
 

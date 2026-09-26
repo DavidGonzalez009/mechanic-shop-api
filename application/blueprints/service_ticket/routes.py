@@ -82,3 +82,31 @@ def remove_mechanic(ticket_id, mechanic_id):
         db.session.commit()
 
     return jsonify({"message": "Mechanic removed successfully"}), 200
+
+@service_ticket_bp.route('/<string:ticket_id>/edit', methods=['PUT'])
+def edit_service_ticket_mechanics(ticket_id):
+    service_ticket = db.session.get(ServiceTicket, ticket_id)
+
+    if service_ticket is None:
+        return jsonify({"message": "Service ticket not found"}), 404
+
+    data = request.get_json()
+
+    add_ids = data.get('add_ids', [])
+    remove_ids = data.get('remove_ids', [])
+
+    for mechanic_id in add_ids:
+        mechanic = db.session.get(Mechanic, mechanic_id)
+
+        if mechanic and mechanic not in service_ticket.mechanics:
+            service_ticket.mechanics.append(mechanic)
+
+    for mechanic_id in remove_ids:
+        mechanic = db.session.get(Mechanic, mechanic_id)
+
+        if mechanic and mechanic in service_ticket.mechanics:
+            service_ticket.mechanics.remove(mechanic)
+
+    db.session.commit()
+
+    return service_ticket_schema.jsonify(service_ticket), 200
