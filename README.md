@@ -1,14 +1,22 @@
 # Mechanic Shop API
 
-A RESTful API built with Flask for managing customers, mechanics and service tickets for a mechanic shop.
+A RESTful API built with Flask for managing customers, mechanics, service tickets, and inventory for a mechanic shop.
 
 ## Features
 
 - Customer management
 - Mechanic CRUD operations
 - Service ticket creation and retrieval
-- Assign mechanics to service tickets
-- Remove mechanics from service tickets
+- Inventory CRUD operations
+- Assign and remove mechanics from service tickets
+- Add inventory parts to service tickets
+- Customer token authentication using JWT
+- Protected customer service ticket route
+- Rate limiting with Flask-Limiter
+- Caching with Flask-Caching
+- Customer pagination using query parameters
+- Advanced SQLAlchemy relationship queries
+- Many-to-many relationships
 - MySQL database integration
 - SQLAlchemy ORM
 - Marshmallow serialization
@@ -21,8 +29,11 @@ A RESTful API built with Flask for managing customers, mechanics and service tic
 - Flask
 - Flask-SQLAlchemy
 - Flask-Marshmallow
+- Marshmallow-SQLAlchemy
+- Flask-Limiter
+- Flask-Caching
+- python-jose
 - MySQL
-- Marshmallow
 - Postman
 
 ## Setup
@@ -31,57 +42,104 @@ A RESTful API built with Flask for managing customers, mechanics and service tic
 
 2. Create a virtual environment:
 
-   python3 -m venv venv
+```bash
+python3 -m venv venv
+```
 
 3. Activate the virtual environment:
 
-   source venv/bin/activate
+```bash
+source venv/bin/activate
+```
 
 4. Install the required packages:
 
-   pip install flask flask-sqlalchemy flask-marshmallow marshmallow-sqlalchemy mysql-connector-python
+```bash
+pip install -r requirements.txt
+```
 
 5. Create a MySQL database named:
 
-   mechanic_shop_db
+```text
+mechanic_shop_db
+```
 
-6. Configure the SQLAlchemy database connection in the application.
+6. Create a `.env` file and configure your database connection:
+
+```text
+DATABASE_URL=your_database_connection_string
+```
 
 7. Run the application:
 
-   python3 app.py
+```bash
+python3 app.py
+```
 
 The API will run at:
 
-    http://127.0.0.1:5000
+```text
+http://127.0.0.1:5000
+```
 
 ## API Endpoints
 
 ### Customers
 
-- POST `/customers` - Create a customer
-- GET `/customers` - Retrieve all customers
-- GET `/customers/<id>` - Retrieve a customer
-- PUT `/customers/<id>` - Update a customer
-- DELETE `/customers/<id>` - Delete a customer
+- `POST /customers` — Create a customer
+- `POST /customers/login` — Log in and receive an authentication token
+- `GET /customers` — Retrieve customers with pagination support
+- `GET /customers/<id>` — Retrieve a customer
+- `PUT /customers/<id>` — Update a customer
+- `DELETE /customers/<id>` — Delete a customer
+
+Pagination example:
+
+```text
+/customers?limit=2&offset=0
+```
 
 ### Mechanics
 
-- POST `/mechanics/` - Create a mechanic
-- GET `/mechanics/` - Retrieve all mechanics
-- PUT `/mechanics/<id>` - Update a mechanic
-- DELETE `/mechanics/<id>` - Delete a mechanic
+- `POST /mechanics/` — Create a mechanic
+- `GET /mechanics/` — Retrieve all mechanics
+- `PUT /mechanics/<id>` — Update a mechanic
+- `DELETE /mechanics/<id>` — Delete a mechanic
+- `GET /mechanics/most-active` — Retrieve mechanics ordered by number of service tickets worked
 
 ### Service Tickets
 
-- POST `/service-tickets/` - Create a service ticket
-- GET `/service-tickets/` - Retrieve all service tickets
-- PUT `/service-tickets/<ticket_id>/assign-mechanic/<mechanic_id>` - Assign a mechanic to a service ticket
-- PUT `/service-tickets/<ticket_id>/remove-mechanic/<mechanic_id>` - Remove a mechanic from a service ticket
+- `POST /service-tickets/` — Create a service ticket
+- `GET /service-tickets/` — Retrieve all service tickets
+- `GET /service-tickets/my-tickets` — Retrieve the authenticated customer's service tickets
+- `PUT /service-tickets/<ticket_id>/assign-mechanic/<mechanic_id>` — Assign a mechanic
+- `PUT /service-tickets/<ticket_id>/remove-mechanic/<mechanic_id>` — Remove a mechanic
+- `PUT /service-tickets/<ticket_id>/edit` — Add or remove multiple mechanics
+- `PUT /service-tickets/<ticket_id>/add-inventory/<inventory_id>` — Add an inventory item to a service ticket
+
+### Inventory
+
+- `POST /inventory/` — Create an inventory item
+- `GET /inventory/` — Retrieve all inventory items
+- `GET /inventory/<id>` — Retrieve an inventory item
+- `PUT /inventory/<id>` — Update an inventory item
+- `DELETE /inventory/<id>` — Delete an inventory item
+
+## Authentication
+
+Customers can log in using their email and password. A successful login returns a JWT authentication token.
+
+Protected routes require the token to be sent using Bearer Token authorization.
+
+Example protected route:
+
+```text
+GET /service-tickets/my-tickets
+```
 
 ## Postman
 
-A Postman collection containing the API endpoint tests is included in this repository.
+A Postman collection containing API endpoint tests is included in this repository.
 
 ## Author
 
