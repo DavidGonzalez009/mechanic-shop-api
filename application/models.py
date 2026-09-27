@@ -11,7 +11,20 @@ service_mechanics = db.Table(
     db.Column('ticket_id', db.String(17), db.ForeignKey('service_tickets.VIN')),
     db.Column('mechanic_id', db.Integer, db.ForeignKey('mechanics.id'))
 )
-
+service_inventory = db.Table(
+    'service_inventory',
+    Base.metadata,
+    db.Column(
+        'ticket_id',
+        db.String(17),
+        db.ForeignKey('service_tickets.VIN')
+    ),
+    db.Column(
+        'inventory_id',
+        db.Integer,
+        db.ForeignKey('inventory.id')
+    )
+)
 
 class Customer(Base):
     __tablename__ = 'customers'
@@ -47,6 +60,11 @@ class ServiceTicket(Base):
         back_populates='service_tickets'
     )
 
+    inventory: Mapped[List["Inventory"]] = db.relationship(
+    secondary=service_inventory,
+    back_populates='service_tickets'
+)
+
 
 class Mechanic(Base):
     __tablename__ = 'mechanics'
@@ -61,3 +79,15 @@ class Mechanic(Base):
         secondary=service_mechanics,
         back_populates='mechanics'
     )
+
+class Inventory(Base):
+    __tablename__ = 'inventory'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(db.String(255), nullable=False)
+    price: Mapped[float] = mapped_column(db.Float, nullable=False)
+
+    service_tickets: Mapped[List["ServiceTicket"]] = db.relationship(
+        secondary=service_inventory,
+        back_populates='inventory'
+    )   

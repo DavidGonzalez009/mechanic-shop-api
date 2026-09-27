@@ -1,7 +1,7 @@
 from flask import request, jsonify
 
 from application.extensions import db
-from application.models import ServiceTicket, Mechanic
+from application.models import ServiceTicket, Mechanic, Inventory
 from application.blueprints.service_ticket import service_ticket_bp
 from application.blueprints.service_ticket.schemas import (
     service_ticket_schema,
@@ -110,3 +110,23 @@ def edit_service_ticket_mechanics(ticket_id):
     db.session.commit()
 
     return service_ticket_schema.jsonify(service_ticket), 200
+
+@service_ticket_bp.route(
+    '/<string:ticket_id>/add-inventory/<int:inventory_id>',
+    methods=['PUT']
+)
+def add_inventory_to_service_ticket(ticket_id, inventory_id):
+    service_ticket = db.session.get(ServiceTicket, ticket_id)
+    inventory = db.session.get(Inventory, inventory_id)
+
+    if service_ticket is None:
+        return jsonify({"message": "Service ticket not found"}), 404
+
+    if inventory is None:
+        return jsonify({"message": "Inventory item not found"}), 404
+
+    if inventory not in service_ticket.inventory:
+        service_ticket.inventory.append(inventory)
+        db.session.commit()
+
+    return jsonify({"message": "Inventory item added successfully"}), 200
