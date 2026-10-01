@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import request, jsonify
 
 from application.extensions import db
@@ -16,7 +17,7 @@ def create_service_ticket():
 
     new_ticket = ServiceTicket(
         VIN=data['VIN'],
-        service_date=data['service_date'],
+        service_date=datetime.strptime(data['service_date'], '%Y-%m-%d').date(),
         service_desc=data['service_desc'],
         customer_id=data['customer_id']
     )
@@ -45,6 +46,7 @@ def get_my_tickets(customer_id):
 
 @service_ticket_bp.route(
     '/<string:ticket_id>/assign-mechanic/<int:mechanic_id>',
+    
     methods=['PUT']
 )
 def assign_mechanic(ticket_id, mechanic_id):
