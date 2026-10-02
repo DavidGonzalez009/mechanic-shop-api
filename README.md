@@ -35,6 +35,8 @@ A RESTful API built with Flask for managing customers, mechanics, service ticket
 - python-jose
 - MySQL
 - Postman
+- Flask-Swagger
+- Flask-Swagger-UI
 
 ## Setup
 
@@ -81,6 +83,30 @@ The API will run at:
 ```text
 http://127.0.0.1:5000
 ```
+
+## API Documentation
+
+Swagger documentation is available while the application is running.
+
+Open the following URL in your browser:
+
+```text
+http://127.0.0.1:5000/api/docs/
+```
+
+The Swagger documentation includes the API endpoints, request methods, parameters, request and response schemas, and authentication requirements.
+
+## Testing
+
+Unit tests are included for the customer, mechanic, service ticket, and inventory routes.
+
+Run the complete test suite with:
+
+```bash
+python -m unittest discover -s tests
+```
+
+The test suite includes positive and negative test cases for API functionality.
 
 ## API Endpoints
 
