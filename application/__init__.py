@@ -25,7 +25,7 @@ swaggerui_blueprint = get_swaggerui_blueprint(
 def create_app(test_config=None):
     app = Flask(__name__)
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 
     if test_config:
      app.config.from_object(test_config)
