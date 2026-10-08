@@ -1,10 +1,10 @@
+import os
 from datetime import datetime, timedelta, timezone
 from jose import jwt
 import jose
 from functools import wraps
 from flask import request, jsonify
 
-SECRET_KEY = "a super secret, secret key"
 
 def encode_token(customer_id):
     payload = {
@@ -13,7 +13,11 @@ def encode_token(customer_id):
         'sub': str(customer_id)
     }
 
-    token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+    token = jwt.encode(
+        payload,
+        os.environ["SECRET_KEY"],
+        algorithm="HS256"
+    )
     return token
 
 def token_required(f):
@@ -30,7 +34,7 @@ def token_required(f):
         try:
             data = jwt.decode(
                 token,
-                SECRET_KEY,
+                os.environ["SECRET_KEY"],
                 algorithms=['HS256']
             )
             customer_id = data['sub']

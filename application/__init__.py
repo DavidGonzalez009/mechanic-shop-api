@@ -28,7 +28,10 @@ def create_app(test_config=None):
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 
     if test_config:
-        app.config.from_object(test_config)
+     app.config.from_object(test_config)
+
+    if not app.config.get('SQLALCHEMY_DATABASE_URI'):
+     raise RuntimeError("Database configuration is missing.")
 
     db.init_app(app)
     ma.init_app(app)
