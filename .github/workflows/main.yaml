@@ -56,3 +56,19 @@ jobs:
         env:
           SECRET_KEY: "ci-testing-secret-key-not-for-production"
         run: python -m unittest discover -s tests -p 'test_*.py'
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Render
+        env:
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: |
+          curl --fail-with-body --request POST \
+            --url "https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys" \
+            --header "Authorization: Bearer ${RENDER_API_KEY}" \
+            --header "Content-Type: application/json" \
+            --data '{}'
