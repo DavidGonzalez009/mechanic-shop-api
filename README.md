@@ -17,7 +17,7 @@ A RESTful API built with Flask for managing customers, mechanics, service ticket
 - Customer pagination using query parameters
 - Advanced SQLAlchemy relationship queries
 - Many-to-many relationships
-- MySQL database integration
+- PostgreSQL production database and MySQL local development
 - SQLAlchemy ORM
 - Marshmallow serialization
 - Flask Blueprints
@@ -33,10 +33,15 @@ A RESTful API built with Flask for managing customers, mechanics, service ticket
 - Flask-Limiter
 - Flask-Caching
 - python-jose
-- MySQL
+- PostgreSQL (Production)
+- MySQL (Local Development)
+- SQLAlchemy ORM
 - Postman
 - Flask-Swagger
 - Flask-Swagger-UI
+- Gunicorn
+- Render
+- GitHub Actions
 
 ## Setup
 
@@ -166,6 +171,77 @@ GET /service-tickets/my-tickets
 ## Postman
 
 A Postman collection containing API endpoint tests is included in this repository.
+
+## Live Deployment
+
+The Mechanic Shop API is deployed on Render.
+
+### Live API Documentation
+
+https://mechanic-shop-api-6bmx.onrender.com/api/docs/
+
+The Swagger interface provides interactive documentation
+for the API endpoints.
+
+### Hosting
+
+- Web Service: Render
+- Production Database: PostgreSQL
+- Production Server: Gunicorn
+- Version Control: GitHub
+
+The application uses environment variables to securely
+configure its database connection and secret key.
+
+Sensitive information is excluded from the GitHub repository.
+
+## CI/CD Pipeline
+
+This project uses GitHub Actions to automate testing
+and deployment.
+
+The workflow is defined in:
+
+.github/workflows/main.yaml
+
+### Pipeline Process
+
+1. Code is pushed to the main branch.
+2. GitHub Actions starts the workflow.
+3. The build job installs the required dependencies.
+4. The test job runs the automated unit tests.
+5. If the tests pass, the deploy job triggers Render.
+6. Render deploys the updated application.
+
+### Pipeline Jobs
+
+- Build
+- Test
+- Deploy
+
+The deployment job depends on the successful completion
+of the test job.
+
+This helps prevent code that fails automated tests from
+being deployed.
+
+## Automated Testing
+
+The project includes 30 automated unit tests covering:
+
+- Customer operations
+- Mechanic operations
+- Service ticket operations
+- Inventory operations
+
+Run the tests locally using:
+
+```bash
+python -m unittest discover -s tests -p 'test_*.py'
+```
+
+GitHub Actions automatically runs these tests as part
+of the CI/CD pipeline.
 
 ## Author
 
